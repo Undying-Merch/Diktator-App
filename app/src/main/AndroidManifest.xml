@@ -12,22 +12,7 @@
         android:theme="@style/Theme.DiktatorApp"
         tools:targetApi="31">
         <activity
-            android:name=".SearchforPhone"
-            android:exported="false" />
-        <activity
-            android:name=".Report"
-            android:exported="false" />
-        <activity
-            android:name=".MyHistory"
-            android:exported="false" />
-        <activity
-            android:name=".Home"
-            android:exported="false" />
-        <activity
-            android:name=".AdminSearch"
-            android:exported="false" />
-        <activity
-            android:name=".Login"
+            android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
