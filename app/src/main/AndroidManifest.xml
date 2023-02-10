@@ -27,7 +27,8 @@
             android:exported="false" />
         <activity
             android:name=".MyPage"
-            android:exported="false" />
+            android:exported="false"
+            android:parentActivityName=".MainActivity"/>
         <activity
             android:name=".AdminMain"
             android:exported="false" />

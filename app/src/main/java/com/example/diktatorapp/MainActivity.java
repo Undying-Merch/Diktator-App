@@ -2,7 +2,9 @@ package com.example.diktatorapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -31,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private String url = "http://10.130.54.25:8000/data/liste/?format=json";
     private String token = "025ae88c5625e6d0718dfe63edb05b387159a872";
 
+    private boolean correctCredentials = false;
 
 
 
@@ -47,7 +50,6 @@ public class MainActivity extends AppCompatActivity {
     public void logon(View view){
         EditText userText = (EditText) findViewById(R.id.loginUserName);
         EditText passText = (EditText) findViewById(R.id.loginPassword);
-        TextView testText = (TextView) findViewById(R.id.loginTest);
         String userName = userText.getText().toString();
         String pass = passText.getText().toString();
 
@@ -56,8 +58,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loginCheck(String brugernavnInput, String passwordInput) {
-        TextView testText = (TextView) findViewById(R.id.loginTest);
-        TextView testText2 = (TextView) findViewById(R.id.loginTest2);
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
@@ -68,7 +68,9 @@ public class MainActivity extends AppCompatActivity {
                         String brugernavn = jsonObject.getString("brugernavn");
                         String password = jsonObject.getString("password");
                         if (brugernavn.matches(brugernavnInput) && password.matches(passwordInput)){
-                            Toast.makeText(MainActivity.this, "Hello there", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(MainActivity.this, MyPage.class);
+                            intent.putExtra("userName", brugernavn);
+                            startActivity(intent);
                         }
                     }
                 } catch (Exception w) {
