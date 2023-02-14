@@ -1,24 +1,30 @@
 package com.example.diktatorapp.Classes;
 
+import java.math.BigInteger;
+
 public class Persons {
     private String name;
     private String address;
+    private String mail;
     private int phone;
     private int zip;
     private int points;
-    private int cpr;
+    private String cpr;
+    private String userName;
     private String password;
 
     public Persons() {
     }
 
-    public Persons(String name, String address, int phone, int zip, int points, int cpr, String password) {
+    public Persons(String name, String address, String mail, int phone, int zip, int points, String cpr, String userName, String password) {
         this.name = name;
         this.address = address;
+        this.mail = mail;
         this.phone = phone;
         this.zip = zip;
         this.points = points;
         this.cpr = cpr;
+        this.userName = userName;
         this.password = password;
     }
 
@@ -36,6 +42,14 @@ public class Persons {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getMail() {
+        return mail;
+    }
+
+    public void setMail(String mail) {
+        this.mail = mail;
     }
 
     public int getPhone() {
@@ -62,12 +76,20 @@ public class Persons {
         this.points = points;
     }
 
-    public int getCpr() {
+    public String getCpr() {
         return cpr;
     }
 
-    public void setCpr(int cpr) {
+    public void setCpr(String cpr) {
         this.cpr = cpr;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public String getPassword() {

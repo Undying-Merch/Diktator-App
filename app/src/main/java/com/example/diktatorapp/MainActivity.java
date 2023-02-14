@@ -18,6 +18,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.diktatorapp.Classes.Database;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,15 +30,7 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity {
 
     RequestQueue requestQueue;
-
-    private String url = "http://10.130.54.25:8000/data/liste/?format=json";
-    private String token = "025ae88c5625e6d0718dfe63edb05b387159a872";
-
-    private boolean correctCredentials = false;
-
-
-
-
+    Database dbobj = new Database();
 
 
     @Override
@@ -45,6 +38,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         requestQueue = Volley.newRequestQueue(this);
+    }
+
+    public void gotoCreate(View view){
+        Intent intent = new Intent(MainActivity.this, createUser.class);
+        startActivity(intent);
     }
 
     public void logon(View view){
@@ -58,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loginCheck(String brugernavnInput, String passwordInput) {
-        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, dbobj.getGetListe(), null, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
                 JSONArray jsonArray = response;
@@ -90,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public Map getHeaders() throws AuthFailureError {
                 HashMap headers = new HashMap();
-                headers.put("Authorization", "Token " + token);
+                headers.put("Authorization", "Token " + dbobj.getToken());
                 return headers;
             }
 
