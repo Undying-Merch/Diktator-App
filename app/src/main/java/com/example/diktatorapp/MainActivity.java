@@ -3,9 +3,12 @@ package com.example.diktatorapp;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,6 +32,12 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
+    private EditText userText, passText;
+    private CheckBox saveLoginCheckBox;
+    private SharedPreferences loginPreferences;
+    private SharedPreferences.Editor loginPrefsEditor;
+    private Boolean saveLogin;
+
     RequestQueue requestQueue;
     Database dbobj = new Database();
 
@@ -38,16 +47,28 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         requestQueue = Volley.newRequestQueue(this);
+
+        userText = findViewById(R.id.loginUserName);
+        passText = findViewById(R.id.loginPassword);
+        saveLoginCheckBox = (CheckBox)findViewById(R.id.loginRemember);
+        loginPreferences = getSharedPreferences("loginPrefs", MODE_PRIVATE);
+        loginPrefsEditor = loginPreferences.edit();
+
+        saveLogin = loginPreferences.getBoolean("saveLogin", false);
+        if (saveLogin == true) {
+            userText.setText(loginPreferences.getString("username", ""));
+            saveLoginCheckBox.setChecked(true);
+        }
+
     }
 
     public void gotoCreate(View view){
         Intent intent = new Intent(MainActivity.this, createUser.class);
         startActivity(intent);
+
     }
 
     public void logon(View view){
-        EditText userText = (EditText) findViewById(R.id.loginUserName);
-        EditText passText = (EditText) findViewById(R.id.loginPassword);
         String userName = userText.getText().toString();
         String pass = passText.getText().toString();
 
@@ -66,6 +87,15 @@ public class MainActivity extends AppCompatActivity {
                         String brugernavn = jsonObject.getString("brugernavn");
                         String password = jsonObject.getString("password");
                         if (brugernavn.matches(brugernavnInput) && password.matches(passwordInput)){
+                            if (saveLoginCheckBox.isChecked()) {
+                                loginPrefsEditor.putBoolean("saveLogin", true);
+                                loginPrefsEditor.putString("username", brugernavnInput);
+                                loginPrefsEditor.commit();
+                            } else {
+                                loginPrefsEditor.clear();
+                                loginPrefsEditor.commit();
+                            }
+
                             Intent intent = new Intent(MainActivity.this, MyPage.class);
                             intent.putExtra("userName", brugernavn);
                             startActivity(intent);
