@@ -3,9 +3,7 @@ package com.example.diktatorapp;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.Activity;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -18,7 +16,6 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.diktatorapp.Classes.Database;
@@ -28,13 +25,16 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
 public class createUser extends AppCompatActivity {
 
+    EditText input1, input2, input3;
+    Button createBNT;
+    //Used for how long a phone number should be
     public int phoneLenght = 8;
+    //Used for how long a social security number should be
     public int cprLenght = 10;
     boolean stage1 = false;
     boolean stage2 = false;
@@ -50,8 +50,14 @@ public class createUser extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_user);
         requestQueue = Volley.newRequestQueue(this);
+
+        input1 = (EditText) findViewById(R.id.createInput1);
+        input2 = (EditText) findViewById(R.id.createInput2);
+        input3 = (EditText) findViewById(R.id.createInput3);
+        createBNT = (Button) findViewById(R.id.createUserBTN);
     }
 
+    //A function for checking a string is of the right lenght.
     public boolean checkLenght(int lenght, String lenghtChekcer){
         boolean isCorrect = true;
         if (lenghtChekcer.length() != lenght){
@@ -60,11 +66,10 @@ public class createUser extends AppCompatActivity {
         }
         return isCorrect;
     }
+
+    //A function to check if any boxes has an empty string
     public boolean checkForEmpty(){
         boolean check = true;
-        EditText input1 = (EditText) findViewById(R.id.createInput1);
-        EditText input2 = (EditText) findViewById(R.id.createInput2);
-        EditText input3 = (EditText) findViewById(R.id.createInput3);
 
         if (input1.getText().toString().matches("") || input2.getText().toString().matches("") || input3.getText().toString().matches("")){
             Toast.makeText(this, "One or more fields are empty", Toast.LENGTH_SHORT).show();
@@ -72,19 +77,16 @@ public class createUser extends AppCompatActivity {
         }
         return check;
     }
+
+    //A function for clearing input fields
     public void clearInput(){
-        EditText input1 = (EditText) findViewById(R.id.createInput1);
-        EditText input2 = (EditText) findViewById(R.id.createInput2);
-        EditText input3 = (EditText) findViewById(R.id.createInput3);
         input1.setText("");
         input2.setText("");
         input3.setText("");
     }
-    public void nextStage1(){
-        EditText input1 = (EditText) findViewById(R.id.createInput1);
-        EditText input2 = (EditText) findViewById(R.id.createInput2);
-        EditText input3 = (EditText) findViewById(R.id.createInput3);
 
+    //A function meant to progress the stages of creating a user
+    public void nextStage1(){
         person.setName(input1.getText().toString());
         person.setUserName(input2.getText().toString());
         person.setCpr(input3.getText().toString());
@@ -95,17 +97,17 @@ public class createUser extends AppCompatActivity {
         input3.setHint("Zip-Code:");
     }
 
+    //The function called when pressing the button, for creating user
     public void createUser(View view) throws JSONException {
-        EditText input1 = (EditText) findViewById(R.id.createInput1);
-        EditText input2 = (EditText) findViewById(R.id.createInput2);
-        EditText input3 = (EditText) findViewById(R.id.createInput3);
-        Button createBNT = (Button) findViewById(R.id.createUserBTN);
 
+        //First stage, where it checks if the user allready exist in the DB
         if (stage1 == false && stage2 == false){
             if (checkForEmpty() == true && checkLenght(cprLenght, input3.getText().toString()) == true){
-                excistingUserCheck(input2.getText().toString(), input3.getText().toString());
+                existingUserCheck(input2.getText().toString(), input3.getText().toString());
             }
-        } else if (stage1 == true && stage2 == false) {
+        }
+        //Stage 2 where we get some more info
+        else if (stage1 == true && stage2 == false) {
             if (checkForEmpty() == true){
                 person.setMail(input1.getText().toString());
                 person.setAddress(input2.getText().toString());
@@ -119,7 +121,9 @@ public class createUser extends AppCompatActivity {
                 stage1 = false;
                 stage2 = true;
             }
-        } else if (stage1 == false && stage2 == true && checkLenght(phoneLenght, input3.getText().toString()) == true) {
+        }
+        //The final stage where it will send the data to the DB
+        else if (stage1 == false && stage2 == true && checkLenght(phoneLenght, input3.getText().toString()) == true) {
             if (input1.getText().toString().matches(input2.getText().toString())){
                 createUserData(input1.getText().toString(), input3.getText().toString());
             }
@@ -131,7 +135,8 @@ public class createUser extends AppCompatActivity {
 
     }
 
-    private void excistingUserCheck(String usernameInput, String cprInput) {
+    //A DB call to check for existing users
+    private void existingUserCheck(String usernameInput, String cprInput) {
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, dbobj.getGetCPR(), null, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
@@ -142,11 +147,9 @@ public class createUser extends AppCompatActivity {
                         String brugernavn = jsonObject.getString("brugernavn");
                         String cpr = jsonObject.getString("cpr");
                         String cprString = String.valueOf(cpr);
+                        //If statements to check if a user already exists.
                         if (usernameInput.matches(brugernavn)) {
                             userInUse = true;
-                        }
-                        else {
-                            person.setUserName(usernameInput);
                         }
                         if (cpr.matches(cprInput)){
                             cprInUse = true;
@@ -185,10 +188,12 @@ public class createUser extends AppCompatActivity {
         requestQueue.add(jsonArrayRequest);
     }
 
+    //The function to create the user in DB.
     private void createUserData(String pass, String phone) {
         StringRequest request = new StringRequest(Request.Method.POST, dbobj.getPostPerson(), new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
+                //A dialog window to show the user has been created, and sending the user back to login.
                 DialogInterface.OnClickListener dialogListener = new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

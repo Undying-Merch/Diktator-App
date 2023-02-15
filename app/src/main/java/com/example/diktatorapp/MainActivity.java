@@ -54,20 +54,23 @@ public class MainActivity extends AppCompatActivity {
         loginPreferences = getSharedPreferences("loginPrefs", MODE_PRIVATE);
         loginPrefsEditor = loginPreferences.edit();
 
+        //Check if there is a saved username
         saveLogin = loginPreferences.getBoolean("saveLogin", false);
         if (saveLogin == true) {
             userText.setText(loginPreferences.getString("username", ""));
+            //If we want to remember password
+            //passText.setText(loginPreferences.getString("password", ""));
             saveLoginCheckBox.setChecked(true);
         }
 
     }
-
+    //Intent for going to create activity
     public void gotoCreate(View view){
         Intent intent = new Intent(MainActivity.this, createUser.class);
         startActivity(intent);
 
     }
-
+    //View used for login button
     public void logon(View view){
         String userName = userText.getText().toString();
         String pass = passText.getText().toString();
@@ -75,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
         loginCheck(userName, pass);
 
     }
-
+    //Function to check login data in DB
     private void loginCheck(String brugernavnInput, String passwordInput) {
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, dbobj.getGetListe(), null, new Response.Listener<JSONArray>() {
             @Override
@@ -87,9 +90,12 @@ public class MainActivity extends AppCompatActivity {
                         String brugernavn = jsonObject.getString("brugernavn");
                         String password = jsonObject.getString("password");
                         if (brugernavn.matches(brugernavnInput) && password.matches(passwordInput)){
+                            //Checks if checkbox is marked, to remember username
                             if (saveLoginCheckBox.isChecked()) {
                                 loginPrefsEditor.putBoolean("saveLogin", true);
                                 loginPrefsEditor.putString("username", brugernavnInput);
+                                //If we want to remember password as well
+                                //loginPrefsEditor.putString("password", passwordInput);
                                 loginPrefsEditor.commit();
                             } else {
                                 loginPrefsEditor.clear();
