@@ -3,6 +3,7 @@ package com.example.diktatorapp.Classes;
 import java.math.BigInteger;
 
 public class Persons {
+    private int id;
     private String name;
     private String address;
     private String mail;
@@ -16,7 +17,8 @@ public class Persons {
     public Persons() {
     }
 
-    public Persons(String name, String address, String mail, int phone, int zip, int points, String cpr, String userName, String password) {
+    public Persons(int id, String name, String address, String mail, int phone, int zip, int points, String cpr, String userName, String password) {
+        this.id = id;
         this.name = name;
         this.address = address;
         this.mail = mail;
@@ -26,6 +28,14 @@ public class Persons {
         this.cpr = cpr;
         this.userName = userName;
         this.password = password;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getName() {

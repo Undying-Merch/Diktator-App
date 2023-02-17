@@ -7,6 +7,8 @@ public class Database {
     private String postPerson = "http://10.130.54.25:8000/data/personcreate/";
     private String getCPR = "http://10.130.54.25:8000/data/cpr/?format=json";
     private String getListe = "http://10.130.54.25:8000/data/liste/?format=json";
+    private String getPerson = "http://10.130.54.25:8000/data/personappalt/";
+    private String getSettings = "http://10.130.54.25:8000/data/settings/?format=json";
 
 
     public String getToken() {
@@ -23,5 +25,13 @@ public class Database {
 
     public String getGetListe() {
         return getListe;
+    }
+
+    public String getGetPerson() {
+        return getPerson;
+    }
+
+    public String getGetSettings() {
+        return getSettings;
     }
 }

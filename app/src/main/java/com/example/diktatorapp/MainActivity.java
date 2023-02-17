@@ -1,7 +1,9 @@
 package com.example.diktatorapp;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -78,34 +80,61 @@ public class MainActivity extends AppCompatActivity {
         loginCheck(userName, pass);
 
     }
+
+    public void dialogBox(String tekst){
+        DialogInterface.OnClickListener dialogListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which){
+                    case DialogInterface.BUTTON_POSITIVE:
+                        break;
+                }
+            }
+        };
+
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setMessage(tekst).setPositiveButton("OK", dialogListener).show();
+    }
     //Function to check login data in DB
     private void loginCheck(String brugernavnInput, String passwordInput) {
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, dbobj.getGetListe(), null, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
                 JSONArray jsonArray = response;
+                boolean userTrue = false;
                 try {
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject jsonObject = jsonArray.getJSONObject(i);
                         String brugernavn = jsonObject.getString("brugernavn");
-                        String password = jsonObject.getString("password");
-                        if (brugernavn.matches(brugernavnInput) && password.matches(passwordInput)){
-                            //Checks if checkbox is marked, to remember username
-                            if (saveLoginCheckBox.isChecked()) {
-                                loginPrefsEditor.putBoolean("saveLogin", true);
-                                loginPrefsEditor.putString("username", brugernavnInput);
-                                //If we want to remember password as well
-                                //loginPrefsEditor.putString("password", passwordInput);
-                                loginPrefsEditor.commit();
-                            } else {
-                                loginPrefsEditor.clear();
-                                loginPrefsEditor.commit();
-                            }
+                        if (brugernavn.matches(brugernavnInput)){
+                            String password = jsonObject.getString("password");
+                            userTrue = true;
+                            if (password.matches(passwordInput)){
 
-                            Intent intent = new Intent(MainActivity.this, MyPage.class);
-                            intent.putExtra("userName", brugernavn);
-                            startActivity(intent);
+                                //Checks if checkbox is marked, to remember username
+                                if (saveLoginCheckBox.isChecked()) {
+                                    loginPrefsEditor.putBoolean("saveLogin", true);
+                                    loginPrefsEditor.putString("username", brugernavnInput);
+                                    //If we want to remember password as well
+                                    //loginPrefsEditor.putString("password", passwordInput);
+                                    loginPrefsEditor.commit();
+                                } else {
+                                    loginPrefsEditor.clear();
+                                    loginPrefsEditor.commit();
+                                }
+
+                                Intent intent = new Intent(MainActivity.this, MyPage.class);
+                                intent.putExtra("userName", brugernavn);
+                                startActivity(intent);
+                            }
+                            else{
+                                dialogBox("Incorrect password");
+                            }
                         }
+                    }
+                    if (userTrue != true){
+                        dialogBox("User does not exist");
                     }
                 } catch (Exception w) {
                     Toast.makeText(MainActivity.this, w.getMessage(), Toast.LENGTH_LONG);
