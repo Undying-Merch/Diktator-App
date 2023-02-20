@@ -36,7 +36,6 @@ import kotlinx.coroutines.Delay;
 
 public class MyPage extends AppCompatActivity {
 
-    boolean startup1, startup2 = false;
     Persons person;
     Settings appSetting;
     Database dbobj = new Database();
@@ -56,9 +55,10 @@ public class MyPage extends AppCompatActivity {
         pointText = findViewById(R.id.pointText);
         superBTN = findViewById(R.id.otherStatBTN);
         person = new Persons();
-        appSetting = new Settings();
+        appSetting = new Settings(getIntent().getIntExtra("pointThreshold" , 600), getIntent().getIntExtra("startUpPoints", 300));
 
         getUser(getIntent().getStringExtra("userName"));
+
 
 
 
@@ -83,47 +83,6 @@ public class MyPage extends AppCompatActivity {
         builder.setMessage(tekst).setPositiveButton("OK", dialogListener).show();
     }
 
-    private void getSettings() {
-
-        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, dbobj.getGetSettings(), null, new Response.Listener<JSONArray>() {
-            @Override
-            public void onResponse(JSONArray response) {
-                JSONArray jsonArray = response;
-                try {
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject jsonObject = jsonArray.getJSONObject(i);
-                        appSetting.setPointThreshold(jsonObject.getInt("pointThreshold"));
-                        appSetting.setStartUpPoints(jsonObject.getInt("startUpPoints"));
-                    }
-                    startup2 = true;
-
-                } catch (Exception w) {
-                    Toast.makeText(MyPage.this, w.getMessage(), Toast.LENGTH_LONG);
-                    dialogBox(w.getMessage());
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(MyPage.this, error.getMessage(), Toast.LENGTH_LONG).show();
-                dialogBox(error.getMessage());
-                startup2 = true;
-            }
-        }) {
-
-            /**
-             * Passing some request headers
-             */
-            @Override
-            public Map getHeaders() throws AuthFailureError {
-                HashMap headers = new HashMap();
-                headers.put("Authorization", "Token " + dbobj.getToken());
-                return headers;
-            }
-
-        };
-        requestQueue.add(jsonArrayRequest);
-    }
     private void getUser(String brugernavn) {
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, dbobj.getGetPerson() + brugernavn + "/", null, new Response.Listener<JSONObject>() {
             @Override
@@ -144,7 +103,11 @@ public class MyPage extends AppCompatActivity {
                     person.setPassword(jsonObject.getString("password"));
                     setView(person.getName(), person.getPoints());
                     dialogBox(person.getName());
-                    startup1 = true;
+
+                    if (person.getPoints() < appSetting.getPointThreshold()){
+                        superBTN.setEnabled(false);
+                        superBTN.setVisibility(View.GONE);
+                    }
 
                 } catch (Exception w) {
                     Toast.makeText(MyPage.this, w.getMessage(), Toast.LENGTH_LONG);
@@ -155,7 +118,6 @@ public class MyPage extends AppCompatActivity {
             public void onErrorResponse(VolleyError error) {
                 Toast.makeText(MyPage.this, error.getMessage(), Toast.LENGTH_LONG).show();
                 dialogBox(error.getMessage());
-                startup1 = true;
             }
         }) {
 

@@ -43,38 +43,37 @@
         android:id="@+id/pointView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="80dp"
-        android:layout_marginTop="256dp"
+        android:layout_marginStart="96dp"
         android:text="Report"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.813"
         app:layout_constraintStart_toEndOf="@+id/myStatsBTN"
-        app:layout_constraintTop_toBottomOf="@+id/pointBar"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toBottomOf="@+id/otherStatBTN"
+        app:layout_constraintVertical_bias="0.343" />
 
     <Button
         android:id="@+id/myStatsBTN"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="36dp"
-        android:layout_marginTop="256dp"
+        android:layout_marginStart="28dp"
         android:onClick="view"
         android:text="My Stats"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/pointBar"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toBottomOf="@+id/otherStatBTN"
+        app:layout_constraintVertical_bias="0.342" />
 
     <Button
         android:id="@+id/otherStatBTN"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="128dp"
         android:text="Others Stats"
-        app:layout_constraintBottom_toTopOf="@+id/myStatsBTN"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.113"
+        app:layout_constraintHorizontal_bias="0.105"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/pointBar"
-        app:layout_constraintVertical_bias="0.802" />
+        app:layout_constraintTop_toBottomOf="@+id/pointBar" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
