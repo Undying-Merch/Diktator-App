@@ -7,7 +7,9 @@ import android.app.Person;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,6 +24,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.diktatorapp.Classes.Database;
 import com.example.diktatorapp.Classes.Persons;
+import com.example.diktatorapp.Classes.Settings;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -29,14 +32,18 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
+import kotlinx.coroutines.Delay;
+
 public class MyPage extends AppCompatActivity {
 
+    boolean startup1, startup2 = false;
     Persons person;
+    Settings appSetting;
     Database dbobj = new Database();
     RequestQueue requestQueue;
     ProgressBar pointProgress;
     TextView pointText, nameText;
-    String user;
+    Button superBTN;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,9 +54,11 @@ public class MyPage extends AppCompatActivity {
         pointProgress = findViewById(R.id.pointBar);
         nameText = findViewById(R.id.mySiteName);
         pointText = findViewById(R.id.pointText);
+        superBTN = findViewById(R.id.otherStatBTN);
+        person = new Persons();
+        appSetting = new Settings();
 
-        user = getIntent().getStringExtra("userName");
-        getUser(user);
+        getUser(getIntent().getStringExtra("userName"));
 
 
 
@@ -74,6 +83,47 @@ public class MyPage extends AppCompatActivity {
         builder.setMessage(tekst).setPositiveButton("OK", dialogListener).show();
     }
 
+    private void getSettings() {
+
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, dbobj.getGetSettings(), null, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                JSONArray jsonArray = response;
+                try {
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject jsonObject = jsonArray.getJSONObject(i);
+                        appSetting.setPointThreshold(jsonObject.getInt("pointThreshold"));
+                        appSetting.setStartUpPoints(jsonObject.getInt("startUpPoints"));
+                    }
+                    startup2 = true;
+
+                } catch (Exception w) {
+                    Toast.makeText(MyPage.this, w.getMessage(), Toast.LENGTH_LONG);
+                    dialogBox(w.getMessage());
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(MyPage.this, error.getMessage(), Toast.LENGTH_LONG).show();
+                dialogBox(error.getMessage());
+                startup2 = true;
+            }
+        }) {
+
+            /**
+             * Passing some request headers
+             */
+            @Override
+            public Map getHeaders() throws AuthFailureError {
+                HashMap headers = new HashMap();
+                headers.put("Authorization", "Token " + dbobj.getToken());
+                return headers;
+            }
+
+        };
+        requestQueue.add(jsonArrayRequest);
+    }
     private void getUser(String brugernavn) {
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, dbobj.getGetPerson() + brugernavn + "/", null, new Response.Listener<JSONObject>() {
             @Override
@@ -82,19 +132,19 @@ public class MyPage extends AppCompatActivity {
                 try {
 
 
-                    int id = jsonObject.getInt("id");
-                    String name = jsonObject.getString("navn");
-                    String address = jsonObject.getString("adresse");
-                    String mail = jsonObject.getString("mail");
-                    int phone = jsonObject.getInt("tlf");
-                    int zip = jsonObject.getInt("postnummer");
-                    int point = jsonObject.getInt("point");
-                    String cpr = jsonObject.getString("cpr");
-                    String userName = jsonObject.getString("brugernavn");
-                    String pass = jsonObject.getString("password");
-                    person = new Persons(id, name, address, mail, phone, zip, point, cpr, userName, pass);
-
+                    person.setId(jsonObject.getInt("id"));
+                    person.setName(jsonObject.getString("navn"));
+                    person.setAddress(jsonObject.getString("adresse"));
+                    person.setMail(jsonObject.getString("mail"));
+                    person.setPhone(jsonObject.getInt("tlf"));
+                    person.setZip(jsonObject.getInt("postnummer"));
+                    person.setPoints(jsonObject.getInt("point"));
+                    person.setCpr(jsonObject.getString("cpr"));
+                    person.setUserName(jsonObject.getString("brugernavn"));
+                    person.setPassword(jsonObject.getString("password"));
                     setView(person.getName(), person.getPoints());
+                    dialogBox(person.getName());
+                    startup1 = true;
 
                 } catch (Exception w) {
                     Toast.makeText(MyPage.this, w.getMessage(), Toast.LENGTH_LONG);
@@ -105,6 +155,7 @@ public class MyPage extends AppCompatActivity {
             public void onErrorResponse(VolleyError error) {
                 Toast.makeText(MyPage.this, error.getMessage(), Toast.LENGTH_LONG).show();
                 dialogBox(error.getMessage());
+                startup1 = true;
             }
         }) {
 
@@ -122,9 +173,12 @@ public class MyPage extends AppCompatActivity {
         requestQueue.add(jsonObjectRequest);
     }
 
+
     public void view(View view){
-        getUser(user);
+        dialogBox(person.getName());
     }
+
+
 
 
 }

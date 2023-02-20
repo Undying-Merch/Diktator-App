@@ -19,4 +19,12 @@ public class Settings {
     public int getStartUpPoints() {
         return startUpPoints;
     }
+
+    public void setPointThreshold(int pointThreshold) {
+        this.pointThreshold = pointThreshold;
+    }
+
+    public void setStartUpPoints(int startUpPoints) {
+        this.startUpPoints = startUpPoints;
+    }
 }

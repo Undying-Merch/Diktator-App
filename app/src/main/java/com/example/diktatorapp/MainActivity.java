@@ -24,6 +24,7 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.diktatorapp.Classes.Database;
+import com.example.diktatorapp.Classes.Settings;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
 
     RequestQueue requestQueue;
     Database dbobj = new Database();
+    Settings appSetting;
 
 
     @Override
@@ -49,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         requestQueue = Volley.newRequestQueue(this);
+        appSetting = new Settings();
 
         userText = findViewById(R.id.loginUserName);
         passText = findViewById(R.id.loginPassword);
@@ -65,10 +68,13 @@ public class MainActivity extends AppCompatActivity {
             saveLoginCheckBox.setChecked(true);
         }
 
+        getSettings();
+
     }
     //Intent for going to create activity
     public void gotoCreate(View view){
         Intent intent = new Intent(MainActivity.this, createUser.class);
+        intent.putExtra("startUpPoints", appSetting.getStartUpPoints());
         startActivity(intent);
 
     }
@@ -126,6 +132,8 @@ public class MainActivity extends AppCompatActivity {
 
                                 Intent intent = new Intent(MainActivity.this, MyPage.class);
                                 intent.putExtra("userName", brugernavn);
+                                intent.putExtra("pointThreshold", appSetting.getPointThreshold());
+                                intent.putExtra("startUpPoints", appSetting.getStartUpPoints());
                                 startActivity(intent);
                             }
                             else{
@@ -144,6 +152,46 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Toast.makeText(MainActivity.this, error.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        }) {
+
+            /**
+             * Passing some request headers
+             */
+            @Override
+            public Map getHeaders() throws AuthFailureError {
+                HashMap headers = new HashMap();
+                headers.put("Authorization", "Token " + dbobj.getToken());
+                return headers;
+            }
+
+        };
+        requestQueue.add(jsonArrayRequest);
+    }
+    private void getSettings() {
+
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, dbobj.getGetSettings(), null, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                JSONArray jsonArray = response;
+                try {
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject jsonObject = jsonArray.getJSONObject(i);
+                        appSetting.setPointThreshold(jsonObject.getInt("pointThreshold"));
+                        appSetting.setStartUpPoints(jsonObject.getInt("startUpPoints"));
+                    }
+
+                } catch (Exception w) {
+                    Toast.makeText(MainActivity.this, w.getMessage(), Toast.LENGTH_LONG);
+                    dialogBox(w.getMessage());
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(MainActivity.this, error.getMessage(), Toast.LENGTH_LONG).show();
+                dialogBox(error.getMessage());
+
             }
         }) {
 

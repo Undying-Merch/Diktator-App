@@ -40,6 +40,7 @@ public class createUser extends AppCompatActivity {
     boolean stage2 = false;
     boolean userInUse = false;
     boolean cprInUse = false;
+    private int startupPoints;
 
     RequestQueue requestQueue;
     Database dbobj = new Database();
@@ -55,6 +56,7 @@ public class createUser extends AppCompatActivity {
         input2 = (EditText) findViewById(R.id.createInput2);
         input3 = (EditText) findViewById(R.id.createInput3);
         createBNT = (Button) findViewById(R.id.createUserBTN);
+        startupPoints = getIntent().getIntExtra("startUpPoints", 400);
     }
 
     //A function for checking a string is of the right lenght.
@@ -230,7 +232,7 @@ public class createUser extends AppCompatActivity {
                 params.put("mail", person.getMail());
                 params.put("tlf", phone);
                 params.put("postnummer", String.valueOf(person.getZip()));
-                params.put("point", "400");
+                params.put("point", String.valueOf(startupPoints));
                 params.put("cpr", String.valueOf(person.getCpr()));
                 params.put("brugernavn", person.getUserName());
                 params.put("password", pass);
