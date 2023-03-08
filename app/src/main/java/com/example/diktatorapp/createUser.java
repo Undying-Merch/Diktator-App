@@ -11,10 +11,13 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.ServerError;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
@@ -25,6 +28,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -99,6 +103,20 @@ public class createUser extends AppCompatActivity {
         input3.setHint("Zip-Code:");
     }
 
+    public void dialogBox(String tekst) {
+        DialogInterface.OnClickListener dialogListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which) {
+                    case DialogInterface.BUTTON_POSITIVE:
+                        break;
+                }
+            }
+        };
+        AlertDialog.Builder builder = new AlertDialog.Builder(createUser.this);
+        builder.setMessage(tekst).setPositiveButton("OK", dialogListener).show();
+    }
+
     //The function called when pressing the button, for creating user
     public void createUser(View view) throws JSONException {
 
@@ -127,6 +145,7 @@ public class createUser extends AppCompatActivity {
         //The final stage where it will send the data to the DB
         else if (stage1 == false && stage2 == true && checkLenght(phoneLenght, input3.getText().toString()) == true) {
             if (input1.getText().toString().matches(input2.getText().toString())){
+
                 createUserData(input1.getText().toString(), input3.getText().toString());
             }
             else{
@@ -214,7 +233,23 @@ public class createUser extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(createUser.this, "An error has occurred", Toast.LENGTH_SHORT).show();
+                NetworkResponse response = error.networkResponse;
+                if (error instanceof ServerError && response != null) {
+                    try {
+                        String res = new String(response.data,
+                                HttpHeaderParser.parseCharset(response.headers, "utf-8"));
+                        // Now you can use any deserializer to make sense of data
+                        JSONObject obj = new JSONObject(res);
+                        dialogBox(obj.toString());
+                    } catch (UnsupportedEncodingException e1) {
+                        // Couldn't properly decode data to string
+                        e1.printStackTrace();
+                    } catch (JSONException e2) {
+                        // returned data is not JSONObject?
+                        e2.printStackTrace();
+                    }
+                }
+
             }
         }) {
             @Override
@@ -230,12 +265,13 @@ public class createUser extends AppCompatActivity {
                 params.put("navn", person.getName());
                 params.put("adresse", person.getAddress());
                 params.put("mail", person.getMail());
-                params.put("tlf", phone);
-                params.put("postnummer", String.valueOf(person.getZip()));
+                params.put("tlf", String.valueOf(phone));
                 params.put("point", String.valueOf(startupPoints));
                 params.put("cpr", String.valueOf(person.getCpr()));
                 params.put("brugernavn", person.getUserName());
                 params.put("password", pass);
+                params.put("postnummer", String.valueOf(person.getZip()));
+                params.put("worksector", "2");
                 return params; //return the parameters
             }
         };

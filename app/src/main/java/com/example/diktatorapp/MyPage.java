@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.Person;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.View;
@@ -36,6 +37,7 @@ import kotlinx.coroutines.Delay;
 
 public class MyPage extends AppCompatActivity {
 
+    String username = "";
     Persons person;
     Settings appSetting;
     Database dbobj = new Database();
@@ -43,6 +45,7 @@ public class MyPage extends AppCompatActivity {
     ProgressBar pointProgress;
     TextView pointText, nameText;
     Button superBTN;
+    private SharedPreferences loginPreferences, currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,12 +57,16 @@ public class MyPage extends AppCompatActivity {
         nameText = findViewById(R.id.mySiteName);
         pointText = findViewById(R.id.pointText);
         superBTN = findViewById(R.id.otherStatBTN);
+        superBTN.setEnabled(false);
+        superBTN.setVisibility(View.INVISIBLE);
+
+        loginPreferences = getSharedPreferences("loginPrefs", MODE_PRIVATE);
+        currentUser = getSharedPreferences("userPref", MODE_PRIVATE);
+
         person = new Persons();
-        appSetting = new Settings(getIntent().getIntExtra("pointThreshold" , 600), getIntent().getIntExtra("startUpPoints", 300));
+        appSetting = new Settings(getIntent().getIntExtra("pointThreshold" , 500), getIntent().getIntExtra("startUpPoints", 300));
 
-        getUser(getIntent().getStringExtra("userName"));
-
-
+        getUser(currentUser.getString("userName", "Test"));
 
 
     }
@@ -90,7 +97,6 @@ public class MyPage extends AppCompatActivity {
                 JSONObject jsonObject  = response;
                 try {
 
-
                     person.setId(jsonObject.getInt("id"));
                     person.setName(jsonObject.getString("navn"));
                     person.setAddress(jsonObject.getString("adresse"));
@@ -101,12 +107,12 @@ public class MyPage extends AppCompatActivity {
                     person.setCpr(jsonObject.getString("cpr"));
                     person.setUserName(jsonObject.getString("brugernavn"));
                     person.setPassword(jsonObject.getString("password"));
+                    person.setWorksector(jsonObject.getInt("worksector"));
                     setView(person.getName(), person.getPoints());
-                    dialogBox(person.getName());
 
-                    if (person.getPoints() < appSetting.getPointThreshold()){
-                        superBTN.setEnabled(false);
-                        superBTN.setVisibility(View.GONE);
+                    if (person.getPoints() >= appSetting.getPointThreshold()){
+                        superBTN.setEnabled(true);
+                        superBTN.setVisibility(View.VISIBLE);
                     }
 
                 } catch (Exception w) {
@@ -138,6 +144,18 @@ public class MyPage extends AppCompatActivity {
 
     public void view(View view){
         dialogBox(person.getName());
+    }
+    public void seeOwnData(View view){
+        Intent intent = new Intent(MyPage.this, MyStats.class);
+        intent.putExtra("id", person.getId());
+        intent.putExtra("userName", person.getUserName());
+        intent.putExtra("name", person.getName());
+        intent.putExtra("points", person.getPoints());
+        startActivity(intent);
+    }
+    public void goToReport(View view){
+        Intent intent = new Intent(MyPage.this, Report.class);
+        startActivity(intent);
     }
 
 

@@ -15,18 +15,23 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".UpdateInfo"
+            android:exported="false" />
+        <activity
             android:name=".createUser"
             android:exported="false"
-            android:parentActivityName=".MainActivity"/>
+            android:parentActivityName=".MainActivity" />
         <activity
             android:name=".MyStats"
-            android:exported="false" />
+            android:exported="false"
+            android:parentActivityName=".MyPage" />
         <activity
             android:name=".SearchForPhone"
             android:exported="false" />
         <activity
             android:name=".Report"
-            android:exported="false" />
+            android:exported="false"
+            android:parentActivityName=".MyPage"/>
         <activity
             android:name=".Search"
             android:exported="false" />

@@ -37,8 +37,8 @@ public class MainActivity extends AppCompatActivity {
 
     private EditText userText, passText;
     private CheckBox saveLoginCheckBox;
-    private SharedPreferences loginPreferences;
-    private SharedPreferences.Editor loginPrefsEditor;
+    private SharedPreferences loginPreferences, currentUser;
+    private SharedPreferences.Editor loginPrefsEditor, userEditor;
     private Boolean saveLogin;
 
     RequestQueue requestQueue;
@@ -57,7 +57,9 @@ public class MainActivity extends AppCompatActivity {
         passText = findViewById(R.id.loginPassword);
         saveLoginCheckBox = (CheckBox)findViewById(R.id.loginRemember);
         loginPreferences = getSharedPreferences("loginPrefs", MODE_PRIVATE);
+        currentUser = getSharedPreferences("userPref", MODE_PRIVATE);
         loginPrefsEditor = loginPreferences.edit();
+        userEditor = currentUser.edit();
 
         //Check if there is a saved username
         saveLogin = loginPreferences.getBoolean("saveLogin", false);
@@ -68,6 +70,8 @@ public class MainActivity extends AppCompatActivity {
             saveLoginCheckBox.setChecked(true);
         }
 
+        userEditor.clear();
+        userEditor.commit();
         getSettings();
 
     }
@@ -129,6 +133,9 @@ public class MainActivity extends AppCompatActivity {
                                     loginPrefsEditor.clear();
                                     loginPrefsEditor.commit();
                                 }
+                                userEditor.putString("userName", brugernavnInput);
+                                userEditor.commit();
+
 
                                 Intent intent = new Intent(MainActivity.this, MyPage.class);
                                 intent.putExtra("userName", brugernavn);

@@ -9,6 +9,7 @@ public class Persons {
     private String mail;
     private int phone;
     private int zip;
+    private int worksector;
     private int points;
     private String cpr;
     private String userName;
@@ -17,17 +18,26 @@ public class Persons {
     public Persons() {
     }
 
-    public Persons(int id, String name, String address, String mail, int phone, int zip, int points, String cpr, String userName, String password) {
+    public Persons(int id, String name, String address, String mail, int phone, int zip, int worksector, int points, String cpr, String userName, String password) {
         this.id = id;
         this.name = name;
         this.address = address;
         this.mail = mail;
         this.phone = phone;
         this.zip = zip;
+        this.worksector = worksector;
         this.points = points;
         this.cpr = cpr;
         this.userName = userName;
         this.password = password;
+    }
+
+    public int getWorksector() {
+        return worksector;
+    }
+
+    public void setWorksector(int worksector) {
+        this.worksector = worksector;
     }
 
     public int getId() {
